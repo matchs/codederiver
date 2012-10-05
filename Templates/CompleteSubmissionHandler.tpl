@@ -1,11 +1,12 @@
-@file_path  
+@file_path foo/bar/baz
 @file_ext php
-@file_langs php html js
+@file_name CompleteSubmissionHandler
+@file_langs php
 
 @features F001.001
 <?php
 
-require 'SubmissionHandler.php'
+require 'SubmissionHandler.php';
 
 class CompleteSubmissionHandler extends SubmissionHandler{
 

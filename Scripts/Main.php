@@ -5,9 +5,9 @@ echo "\nStarting script execution\n\n";
 
 $codeGen = new CodeGen();
 
-$codeGen->generateAllProducts();
+//$codeGen->generateAllProducts();
 
-//$codeGen->generateProduct('sm2');
+$codeGen->generateProduct('sm2');
 //if($codeGen->generateAllProducts() == true){
 //    echo "\nEnd of script execution\nStatus: Success\n";
 //}else{

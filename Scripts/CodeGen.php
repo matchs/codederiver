@@ -233,15 +233,27 @@ class CodeGen {
         
         $this->_parser->setFeatureSet($this->_prdXML[$prd_id]);
         
-        foreach ($this->_tplFiles as $filename) {
-            $this->verbose_mode == true ? print("Parsing {$filename} .......... ") : '';
+        foreach ($this->_tplFiles as $tpl_filename) {
+            $this->verbose_mode == true ? print("Parsing {$tpl_filename} .......... ") : '';
 
-            $path = $this->tpl_folder . DIRECTORY_SEPARATOR . $filename;
-            
+            //reading the template files
+            $path = $this->tpl_folder . DIRECTORY_SEPARATOR . $tpl_filename;
             $this->_parser->setTemplateFile(file($path));
-            $content = $this->_parser->parse();
             
-            $newfile = $genpath . DIRECTORY_SEPARATOR . preg_replace('/\.tpl$/', '', $filename) . '.' . $this->file_ext;
+            //parsing the template files
+            $parsed = $this->_parser->parse();
+            $content = $parsed['file'];
+            $file_ext = $parsed['file_ext'];
+            $file_name = $parsed['file_name'];
+            $file_path = preg_replace('/[\/]$/','',$parsed['file_path']);//removing the last directory separator
+            $file_path = $genpath . DIRECTORY_SEPARATOR . preg_replace('/[\/]/', DIRECTORY_SEPARATOR, $file_path);
+            
+            
+            mkdir($file_path, 0777, true);
+            
+            
+            //creating files
+            $newfile = $file_path . DIRECTORY_SEPARATOR . $file_name . '.' . $file_ext;
             
             if (strlen($content) > 0) {
                 if ($handle = fopen($newfile, 'w')) {

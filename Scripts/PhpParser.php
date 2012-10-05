@@ -21,36 +21,70 @@ class PhpParser extends Parser {
     public function parse() {
         $this->resetFileLines();
         foreach ($this->file as $line => $content) {
-            if ($this->isAnotation($content)) {
+//            echo $content;echo "\n";
+            if ($this->isAnnotation($content)) {
 
                 $this->emptyLine($line);
 
-                $features = $this->getFeatures($content);
+                $ann_type = $this->getAnnotationType($content);
+                //              var_dump($ann_type);die;
+
+
+                switch ($ann_type) {
+                    case Parser::$FEATURES:
+                        $features = $this->getFeatures($content);
+                        break;
+                    case Parser::$FILE_NAME:
+                        $filename = $this->getAnnotationParameters($content);
+                        break;
+                    case Parser::$FILE_EXT:
+                        $fileext = $this->getAnnotationParameters($content);
+                        break;
+                    case Parser::$FILE_PATH:
+                        $filepath = $this->getAnnotationParameters($content);
+                        break;
+                    case Parser::$FILE_LANGS:
+                        $filelangs = $this->getAnnotationParameters($content);
+                        break;
+                }
+
 
 
                 $belongsToProduct = false;
 
-                foreach ($features as $feature) {
-                    if (array_search($feature, $this->features) === false) {
-                        //echo "\n{$feature} doesn't belong to feature set";
+                if (isset($features)) {
+                    foreach ($features as $feature) {
+                        if (array_search($feature, $this->features) === false) {
+                            //echo "\n{$feature} doesn't belong to feature set";
 
-                        $belongsToProduct = false;
-                    } else {
-                        //echo "\n{$feature} belongs to feature set";
+                            $belongsToProduct = false;
+                        } else {
+                            //echo "\n{$feature} belongs to feature set";
 
-                        $belongsToProduct = true;
+                            $belongsToProduct = true;
+                        }
                     }
-                }
 
-                if (!$belongsToProduct) {
-                    $newline = $line + 1;
-                    $this->stripUnusedContent($newline);
-                    $this->resetFileLines();
+                    if (!$belongsToProduct) {
+                        $newline = $line + 1;
+                        $this->stripUnusedContent($newline);
+                        $this->resetFileLines();
+                    }
                 }
             }
         }
 
-        return $this->assembleFile();
+        if (!isset($filename) || !isset($filepath) || !isset($fileext)) {
+            throw new Exception('Missing required header annotations');
+        }
+
+        return array(
+            'file' => $this->assembleFile(),
+            'file_name' => $filename[0],
+            'file_path' => $filepath[0],
+            'file_ext' => $fileext[0],
+            'file_langs' => $filelangs
+        );
     }
 
     /**
@@ -60,7 +94,6 @@ class PhpParser extends Parser {
      * @return bool
      */
     protected function stripUnusedContent($line) {
-        
         /* Removing between php tags: <?php ?> */
         if ($this->isPhpOpeningTag($this->file[$line])) {
             for ($i = $line; isset($this->file[$i]); $i++) {
@@ -71,22 +104,22 @@ class PhpParser extends Parser {
                     $this->emptyLine($i);
                 }
             }
-        /* Remving a single line statement: $var = 'foo'; */
+            /* Remving a single line statement: $var = 'foo'; */
         } else if ($this->isSingleLineStatement($this->file[$line])) {
             $this->emptyLine($line);
             return true;
-            
-        /* Removing an entire block declaration statement. For example: A class declaration, a function declaration, a while block */    
+
+            /* Removing an entire block declaration statement. For example: A class declaration, a function declaration, a while block */
         } else if ($this->isBlockDeclarationOpeningStatement($this->file[$line])) {
-            
+
             /* Looking for block declaration brackets at the end of the current line or the beginning of the next line */
             if ((preg_match('/{$/', $this->file[$line]) > 0) || (preg_match('/^{/', $this->file[$line + 1]) > 0)) {
                 return $this->removeBlock($line);
 
-            /* Looking forward for a single line statement */
-            } else if ($this->isSingleLineStatement($this->file[$line+1])) {
+                /* Looking forward for a single line statement */
+            } else if ($this->isSingleLineStatement($this->file[$line + 1])) {
                 $this->emptyLine($line);
-                $this->emptyLine($line+1);
+                $this->emptyLine($line + 1);
                 return true;
             }
         }
@@ -100,31 +133,30 @@ class PhpParser extends Parser {
      * @param int $line the block 1st line
      * @return bool
      */
-    protected function removeBlock($line){
+    protected function removeBlock($line) {
         /**
-         *@var int $o_stack Openning brackets stack 
+         * @var int $o_stack Openning brackets stack 
          */
         $o_stack = 0;
-        
+
         /**
-         *@var int $o_stack Closing brackets stack 
+         * @var int $o_stack Closing brackets stack 
          */
         $c_stack = 0;
-        
-        for($i = $line; isset($this->file[$i]); $i++){
+
+        for ($i = $line; isset($this->file[$i]); $i++) {
             $o_stack += $this->hasBlockOpeningBrackets($this->file[$i]);
             $c_stack += $this->hasBlockClosingBrackets($this->file[$i]);
             //echo "\n $o_stack : $c_stack " . $this->file[$i];
             $this->emptyLine($i);
-            
-            if(($o_stack == $c_stack) && ($o_stack > 0)){
+
+            if (($o_stack == $c_stack) && ($o_stack > 0)) {
                 return true;
             }
         }
         return false;
-        
     }
-    
+
     /**
      * Asserts if a given string is a php closing tag : ?>
      * 
@@ -164,20 +196,21 @@ class PhpParser extends Parser {
      * @param type $str 
      * @return int The number of { 
      */
-    protected function hasBlockOpeningBrackets($str){
+    protected function hasBlockOpeningBrackets($str) {
         $x = preg_match('/{/', $str);
         return $x > 0 ? $x : 0;
     }
-    
+
     /**
      * Counts the number of block opening brackets: }
      * 
      * @param type $str 
      * @return int The number of }
      */
-    protected function hasBlockClosingBrackets($str){
+    protected function hasBlockClosingBrackets($str) {
         $x = preg_match('/}/', $str);
         return $x > 0 ? $x : 0;
     }
+
 }
 ?> 

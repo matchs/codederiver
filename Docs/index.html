@@ -9,6 +9,67 @@ and open the template in the editor.
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
-        <div>TODO write content</div>
+        <div id="menu">
+            <ul>
+                <li>
+                    <a href="#intro">Intro</a>
+                </li>
+                <li>
+                    <a href="#def">Definitions</a>
+                </li>
+                <li>
+                    <a href="#pre">Prerequisites</a>
+                </li>
+                <li>
+                    <a href="#tpl">Templates</a>
+                </li>
+                <li>
+                    <a href="#prodef">Products Definitions</a>
+                </li>
+                <li>
+                    <a href="#anot">Annotations</a>
+                </li>
+               
+            </ul>
+        </div>
+        <div id="intro">
+            <h1>Intro</h1>
+        </div>
+        <div id="def">
+            <h1>Definitions</h1>
+        </div>
+        <div id="pre">
+            <h1>Prerequisites</h1>
+        </div>
+        <div id="tpl">
+            <h1>Templates</h1>
+        </div>
+        <div id="prodef">
+            <h1>Products Definitions</h1>
+        </div>
+        <div id="anot">
+            <h1>Annotations</h1>
+            <p>
+                Every annotation begin with a @ and must be alone in the line wich it is present. 
+                Separated from the annotation declaration by one single blank space comes a set of parameters separated of each other by one single blank space. 
+                The following are the currently supported annotations: <i>@file_path</i>, <i>@file_name</i>, <i>@file_ext</i>, <i>@file_langs</i>, <i>@features</i>
+                <br/>
+                Annotations should match the following regular expression: @[a-zA-Z0-9]+\n.*
+            </p>
+            <h2>@file_path</h2>
+            <p>Required at the top of the file. One parameter. The @file_path annotation defines the path the output file will be written inside the <i>Generateds folder</i>. The not pre-existent folders are goind to be created inside of the product folder.</p>
+            
+            <h2>@file_name</h2>
+            <p>Required at the top of the file. One parameter. The @file_name annotation defines the name of the output file</p>
+            
+            <h2>@file_ext</h2>
+            <p>Required at the top of the file. One parameter. The @file_ext annotation defines the file extension of the output file</p>
+            
+            <h2>@file_langs</h2>
+            <p>Required at the top of the file. One or more parameters. The @file_langs annotation defines the set of languages that are going to be present in the file. E.g. A php page may contain html, php and javascript</p>
+            
+            <h2>@features</h2>
+            <p>Used on the top of a statement. One or more parameters. The @features annotation defines the set of products that implements that piece of code</p>
+        </div>
     </body>
 </html>

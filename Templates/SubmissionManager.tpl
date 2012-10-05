@@ -1,3 +1,8 @@
+@file_path foo/bar/baz
+@file_ext php
+@file_name SubmissionManager
+@file_langs php
+
 <?php
 
 @features F001.002

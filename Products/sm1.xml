@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<product id='sm1'>
+	<name>Submission Manager 1</name>
+	<description>Submission manager for complete submission only, and no pdf bulding</description>
+	<featureset>
+		<feature id='F001.001'/>
+	</featureset>
+</product> 

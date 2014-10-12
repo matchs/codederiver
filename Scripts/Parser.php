@@ -41,6 +41,7 @@ abstract class Parser {
      * @param SimpleXMLElement $xml 
      */
     public function setFeatureSet(SimpleXMLElement $xml) {
+        $this->features = array();
         foreach ($xml->featureset->children() as $feature) {
             $f = (string) $feature->attributes()->id;
 
